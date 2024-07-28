@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MethodPaymentEnum {
+  Transfer
+  Gopay
+}
+
+model User {
+  id        String      @default(uuid()) @id
+  email     String      @unique
+  name      String?
+  password  String?     @db.VarChar(150)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  cart      Cart[]       
+  invoice   Invoice[]
+}
+
+model Invoice {
+  id              String              @default(uuid()) @id
+  invoiceDate     DateTime
+  paymentMethod   MethodPaymentEnum
+  amount          Decimal
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  order           Order?
+  author          User                @relation(fields: [authorId], references: [id])
+  authorId        String              @unique
+}
+
+model Order {
+  id              String              @default(uuid()) @id
+  orderDate       DateTime
+  totalPrice      Decimal
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  orderItem       OrderItem[]
+  shipment        Shipment?
+  invoice         Invoice             @relation(fields: [invoiceId], references: [id])
+  invoiceId       String              @unique
+
+}
+
+//similar with CartItem
+model OrderItem {
+  id              String              @default(uuid()) @id
+  quantity        Int
+  price           Decimal
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  order           Order               @relation(fields: [orderId], references: [id])
+  orderId         String              @unique
+  product         Product             @relation(fields: [productId], references: [id])
+  productId       String              @unique
+}
+
+model Shipment {
+  id              String              @default(uuid()) @id
+  shipmentDate    DateTime
+  address         String
+  city            String
+  state           String
+  country         String
+  postalCode      String
+  amount          Decimal
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  order           Order               @relation(fields: [orderId], references: [id])
+  orderId         String              @unique
+}
+
+model Cart {
+  id          String    @default(uuid()) @id
+  quantity    Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt @default(now())
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String    @unique
+  cartItems   CartItem[]
+}
+
+model CartItem {
+  id              String              @default(uuid()) @id
+  quantity        Int
+  price           Decimal
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  cart            Cart                @relation(fields: [cartId], references: [id])
+  cartId          String              @unique
+  product         Product             @relation(fields: [productId], references: [id])
+  productId       String              @unique
+}
+
+model Product {
+  id            String        @default(uuid()) @id
+  name          String
+  image         String
+  description   String
+  price         Decimal
+  stock         Int
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt @default(now())
+  orderItem     OrderItem[]
+  cartItem      CartItem[]
+  categories    Category[]    @relation("ProductCategories")     
+}
+
+model Category {
+  id            String        @default(uuid()) @id
+  name          String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt @default(now())
+  products      Product[]     @relation("ProductCategories")  
+}
