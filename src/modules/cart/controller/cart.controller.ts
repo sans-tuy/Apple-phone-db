@@ -17,6 +17,7 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
   private logger = new Logger('cart controller');
 
+  // @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get all carts' })
   @ApiResponse({
     status: 200,
