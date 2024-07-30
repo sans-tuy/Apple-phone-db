@@ -13,7 +13,6 @@ export class AuthService {
 
   // method validate user
   async validateUser(email: string, pass: string): Promise<any> {
-    console.log('tidak masuk sini kan');
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
@@ -38,17 +37,14 @@ export class AuthService {
 
   // method to get jwt token after login with google
   async loginWithGoogle(user: any) {
-    console.log('masuk service login with google', user);
     let dbUser = await this.userService.getUserByEmail(user.email);
     if (!dbUser) {
-      console.log('akun google tidak ditemukan pada db');
       // Create new user if not found
       dbUser = await this.userService.createUser({
         email: user.email,
         name: `${user?.firstName || ''} ${user?.lastName || ''}`,
       });
     }
-    console.log('akun google ditemukan pada db');
     const payload = { email: dbUser.email, sub: dbUser.id };
     return {
       access_token: this.jwtService.sign(payload),
