@@ -4,6 +4,7 @@ import { ProductModule } from './modules/product/product.module';
 import { CategoryModule } from './modules/category/category.module';
 import { CartModule } from './modules/cart/cart.module';
 import { CartItemModule } from './modules/CartItem/cartItem';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { CartItemModule } from './modules/CartItem/cartItem';
     ProductModule,
     CategoryModule,
     CartItemModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

@@ -1,9 +1,10 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
-import { createCustomError } from 'src/common/utils/helpers';
+import { createCustomError, hashPassword } from 'src/common/utils/helpers';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { UserDto } from '../dto';
+import { CreateUserDto, UserDto } from '../dto';
+import { UserWithPassDto } from '../dto/user-with-pass.dto';
 
 @Injectable()
 export class UserService {
@@ -34,6 +35,27 @@ export class UserService {
       );
     }
   }
+
+  async getUserByEmail(email: CreateUserDto['email']): Promise<User | null> {
+    this.logger.log('userById');
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
+      if (!user) {
+        return null;
+      }
+      return plainToInstance(UserWithPassDto, user);
+    } catch (e) {
+      throw createCustomError(
+        e.message || 'Something went wrong',
+        e.status || HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async getAllUsers() {
     this.logger.log('getAllUsers');
     try {
@@ -55,10 +77,14 @@ export class UserService {
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    const { password, ...rest } = data;
     this.logger.log('createUser');
     try {
       const createUser = await this.prisma.user.create({
-        data,
+        data: {
+          password: password ? await hashPassword(password) : null,
+          ...rest,
+        },
         include: {
           cart: true,
         },
