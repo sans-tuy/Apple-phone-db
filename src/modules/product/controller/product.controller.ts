@@ -11,6 +11,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateProductDto, ProductDto, UpdateProductDto } from '../dto';
 import { ProductService } from '../service/product.service';
+import { Public } from 'src/modules/auth/public.decorator';
 
 @ApiTags('Product')
 @Controller('product')
@@ -18,6 +19,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
   private logger = new Logger('Product controller');
 
+  @Public()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({
     status: 200,
@@ -31,6 +33,7 @@ export class ProductController {
     return await this.productService.getAllProducts();
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get product by id' })
   @ApiResponse({
     status: 200,

@@ -11,6 +11,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoryService } from '../service/category.service';
 import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from '../dto';
+import { Public } from 'src/modules/auth/public.decorator';
 
 @ApiTags('Category')
 @Controller('category')
@@ -18,6 +19,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
   private logger = new Logger('Category controller');
 
+  @Public()
   @ApiOperation({ summary: 'Get all category' })
   @ApiResponse({
     status: 200,
@@ -31,6 +33,7 @@ export class CategoryController {
     return await this.categoryService.getAllCategories();
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get category by id' })
   @ApiResponse({
     status: 200,

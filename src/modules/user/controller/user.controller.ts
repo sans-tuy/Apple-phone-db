@@ -7,10 +7,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { UserService } from '../services/user.service';
-import { User as UserModel } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
+import { User as UserModel } from '@prisma/client';
 import { CreateUserDto } from '../dto';
+import { UserService } from '../services/user.service';
 
 @ApiTags('User')
 @Controller('user')
