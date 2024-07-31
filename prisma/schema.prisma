@@ -28,6 +28,8 @@ model User {
   updatedAt DateTime    @updatedAt
   cart      Cart[]       
   invoice   Invoice[]
+
+  @@index([email])      //index by email for faster search user by email
 }
 
 model Invoice {

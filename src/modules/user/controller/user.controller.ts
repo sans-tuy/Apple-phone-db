@@ -11,6 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { User as UserModel } from '@prisma/client';
 import { CreateUserDto } from '../dto';
 import { UserService } from '../services/user.service';
+import { Public } from 'src/modules/auth/public.decorator';
 
 @ApiTags('User')
 @Controller('user')
@@ -27,6 +28,7 @@ export class UserController {
     return this.userService.user({ id: id });
   }
 
+  @Public()
   @Post()
   async signupUser(@Body() userData: CreateUserDto): Promise<UserModel> {
     return this.userService.createUser({
