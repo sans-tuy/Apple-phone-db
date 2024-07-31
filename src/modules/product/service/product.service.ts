@@ -1,14 +1,20 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Prisma, Product as ProductModel } from '@prisma/client';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { CreateProductDto, UpdateProductDto } from '../dto';
 import { createCustomError } from 'src/common/utils/helpers';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly prisma: PrismaService,
+  ) {}
+  private readonly logger = new Logger(ProductService.name);
 
-  getAllProducts(): Promise<ProductModel[]> {
+  async getAllProducts(): Promise<ProductModel[]> {
     try {
       const product = this.prisma.product.findMany({
         include: {
@@ -24,9 +30,14 @@ export class ProductService {
     }
   }
 
-  getProductById(id: string): Promise<ProductModel | null> {
+  async getProductById(id: string): Promise<ProductModel | null> {
     try {
-      const product = this.prisma.product.findUnique({
+      // is data product exist on cache
+      const cachedProduct: ProductModel = await this.cacheManager.get(id);
+      if (cachedProduct) {
+        return cachedProduct;
+      }
+      const product = await this.prisma.product.findUnique({
         where: {
           id: id,
         },
@@ -34,6 +45,10 @@ export class ProductService {
           categories: true,
         },
       });
+
+      // save data to cache
+      await this.cacheManager.set(id, product);
+
       return product;
     } catch (e) {
       throw createCustomError(
@@ -43,7 +58,7 @@ export class ProductService {
     }
   }
 
-  createProduct(data: CreateProductDto): Promise<ProductModel> {
+  async createProduct(data: CreateProductDto): Promise<ProductModel> {
     try {
       const { categories, ...req } = data;
       const product = this.prisma.product.create({
@@ -66,7 +81,7 @@ export class ProductService {
     }
   }
 
-  updateProduct(params: {
+  async updateProduct(params: {
     where: Prisma.ProductWhereUniqueInput;
     data: UpdateProductDto;
   }): Promise<ProductModel> {
@@ -94,7 +109,9 @@ export class ProductService {
     }
   }
 
-  deleteProduct(where: Prisma.ProductWhereUniqueInput): Promise<ProductModel> {
+  async deleteProduct(
+    where: Prisma.ProductWhereUniqueInput,
+  ): Promise<ProductModel> {
     try {
       const product = this.prisma.product.delete({
         where,

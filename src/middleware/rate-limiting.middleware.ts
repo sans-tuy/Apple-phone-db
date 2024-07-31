@@ -6,7 +6,8 @@ import rateLimit from 'express-rate-limit';
 const limiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 4, // Limit each IP to 4 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
+  message:
+    'Too many requests to login from this IP, please try again later (estimate 30 minutes).',
 });
 
 @Injectable()
