@@ -14,11 +14,15 @@ export class ProductService {
   ) {}
   private readonly logger = new Logger(ProductService.name);
 
-  async getAllProducts(): Promise<ProductModel[]> {
+  async getAllProducts(): Promise<Partial<ProductModel>[]> {
     try {
       const product = this.prisma.product.findMany({
-        include: {
-          categories: true,
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          description: true,
+          price: true,
         },
       });
       return product;

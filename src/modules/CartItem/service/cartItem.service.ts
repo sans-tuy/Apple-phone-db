@@ -8,9 +8,9 @@ import { CreateCartItemDto, UpdateCartItemDto } from '../dto';
 export class CartItemService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getAllCartItems(): Promise<CartItemModel[]> {
+  async getAllCartItems(): Promise<CartItemModel[]> {
     try {
-      const cartItem = this.prisma.cartItem.findMany({
+      const cartItem = await this.prisma.cartItem.findMany({
         include: {
           product: true,
         },
@@ -24,9 +24,9 @@ export class CartItemService {
     }
   }
 
-  getCartItemById(id: string): Promise<CartItemModel | null> {
+  async getCartItemById(id: string): Promise<CartItemModel | null> {
     try {
-      const cartItem = this.prisma.cartItem.findUnique({
+      const cartItem = await this.prisma.cartItem.findUnique({
         where: {
           id: id,
         },
@@ -43,9 +43,9 @@ export class CartItemService {
     }
   }
 
-  createCartItem(data: CreateCartItemDto): Promise<CartItemModel> {
+  async createCartItem(data: CreateCartItemDto): Promise<CartItemModel> {
     try {
-      const cartItem = this.prisma.cartItem.create({
+      const cartItem = await this.prisma.cartItem.create({
         data,
         include: {
           product: true,
@@ -60,14 +60,14 @@ export class CartItemService {
     }
   }
 
-  updateCartItem(params: {
+  async updateCartItem(params: {
     where: Prisma.CartItemWhereUniqueInput;
     data: UpdateCartItemDto;
   }): Promise<CartItemModel> {
     try {
       const { where, data } = params;
       const { productId, ...req } = data;
-      const cartItem = this.prisma.cartItem.update({
+      const cartItem = await this.prisma.cartItem.update({
         where,
         data: {
           ...req,
@@ -88,11 +88,11 @@ export class CartItemService {
     }
   }
 
-  deleteCartItem(
+  async deleteCartItem(
     where: Prisma.CartItemWhereUniqueInput,
   ): Promise<CartItemModel> {
     try {
-      const cartItem = this.prisma.cartItem.delete({
+      const cartItem = await this.prisma.cartItem.delete({
         where,
         include: {
           product: true,
