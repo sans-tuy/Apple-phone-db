@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/jwt/jwt-auth.guard';
 import { RateLimitingMiddleware } from './middleware/rate-limiting.middleware';
 import { CacheModule } from '@nestjs/cache-manager';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     CategoryModule,
     CartItemModule,
     AuthModule,
+    PaymentModule,
     CacheModule.register({
       isGlobal: true,
       ttl: 1000 * 60 * 60 * 1, // one hours before cache is expired

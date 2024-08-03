@@ -1,10 +1,10 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { Prisma, Product as ProductModel } from '@prisma/client';
+import { Cache } from 'cache-manager';
+import { createCustomError } from 'src/common/utils/helpers';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { CreateProductDto, UpdateProductDto } from '../dto';
-import { createCustomError } from 'src/common/utils/helpers';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductService {

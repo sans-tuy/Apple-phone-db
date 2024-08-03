@@ -19,6 +19,12 @@ enum MethodPaymentEnum {
   Gopay
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  ACCEPTED
+}
+
 model User {
   id        String      @default(uuid()) @id
   email     String      @unique
@@ -37,6 +43,8 @@ model Invoice {
   invoiceDate     DateTime
   paymentMethod   MethodPaymentEnum
   amount          Decimal
+  status          PaymentStatus
+  paymentId       String              @unique
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   order           Order?
